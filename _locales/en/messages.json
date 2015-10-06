@@ -1,0 +1,9 @@
+{"extName": {
+   "message": "Download and Compute Hash",
+   "description": "Extension Name"},
+ "extDesc": {
+   "message": "Download and Compute Hash Context Menu Button",
+   "description": "Extension Description"},
+ "openContextMenuTitle": {
+   "message": "Download and Compute Hash",
+   "description": "Context menu button text"}}
