@@ -1,0 +1,9 @@
+{
+    "name": "@PLUGIN_NATIVE_NSPATH@",
+    "description": "Integrity check file hasher",
+    "path": "IntegrityPlugin.exe",
+    "type": "stdio",
+    "allowed_origin": [
+        "chrome-extension://@EXTENSION_ID@/"
+    ]
+}
