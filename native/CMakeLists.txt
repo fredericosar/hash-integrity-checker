@@ -1,22 +1,34 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(IntegrityPlugin)
 
 set(PLUGIN_NATIVE_NSPATH edu.utah.cs.cs6964.integrity_plugin
     CACHE STRING "Native messaging host identifier")
+set(EXTENSION_ID unknown
+    CACHE STRING "chrome-extension URI identifying browser plugin")
+
+include_directories(microjson)
+add_library(MicroJSON microjson/mjson.c)
 
 add_executable(IntegrityPlugin main.c sha1.c md5.c)
-install(TARGETS IntegrityPlugin
-        RUNTIME DESTINATION /)
+target_link_libraries(IntegrityPlugin MicroJSON)
 
-configure_file(manifest.json.in manifest.json)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/manifest.json" DESTINATION /)
+configure_file(postinstall.h.in postinstall.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+add_executable(postinstall postinstall.c)
+
+install(TARGETS IntegrityPlugin postinstall
+        RUNTIME DESTINATION /)
 
 if(WIN32)
     # TODO turns out there's a WiX generator, which I think is less bad.
+    # On install, run postinstall to make the manifest, and install the
+    # requisite registry key.
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+        "ExecWait '\\\"$INSTDIR\\\\postinstall.exe\\\" \\\"$INSTDIR\\\\manifest.json\\\" \\\"$INSTDIR\\\\IntegrityPlugin.exe\\\"'"
         "ExecWait 'REG ADD HKLM\\\\Software\\\\Google\\\\Chrome\\\\NativeMessagingHosts\\\\${PLUGIN_NATIVE_NSPATH} /f /d \\\"$INSTDIR\\\\manifest.json\\\"'"
     )
+    # On uninstall, remove the registry key we created.
     set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS
         "ExecWait 'REG DELETE HKLM\\\\Software\\\\Google\\\\Chrome\\\\NativeMessagingHosts\\\\${PLUGIN_NATIVE_NSPATH} /va /f'"
     )
