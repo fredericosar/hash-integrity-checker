@@ -23,7 +23,11 @@ if(WIN32)
     )
 
 else()
-    message(SEND_ERROR Installers for non-Windows not implemented.)
+    message(WARNING "Installers for non-Windows not implemented.")
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif()
 
 add_subdirectory(native)
