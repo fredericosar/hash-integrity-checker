@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
         int status = json_read_object(json_buffer, MESSAGE_SCHEMA, NULL);
         if (status != 0) {
-            fprintf(stderr, "Failed to decode SJON: %s\n", json_error_string(status));
+            fprintf(stderr, "Failed to decode JSON: %s\n", json_error_string(status));
             return 1;
         }
 

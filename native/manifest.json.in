@@ -3,7 +3,7 @@
     "description": "Integrity check file hasher",
     "path": "IntegrityPlugin.exe",
     "type": "stdio",
-    "allowed_origin": [
+    "allowed_origins": [
         "chrome-extension://@EXTENSION_ID@/"
     ]
 }

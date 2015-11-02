@@ -2,8 +2,6 @@
    "message": "Hash Checker Ext",
    "description": "Extension Name"},
  "extDesc": {
-   "message": "Adds context menu entry for Hash Checker.",
-   "description": "Extension Description"},
- "openContextMenuTitle": {
-   "message": "Download File and Compute Hash",
-   "description": "Context menu button text"}}
+   "message": "Computes hashes of downloaded files.",
+   "description": "Extension Description"}
+}
