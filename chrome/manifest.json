@@ -9,13 +9,13 @@
           "128": "icon128.png" },
   "background": {
 		"persistent": false,
-		"scripts": ["md5.js", "sha1.js", "background.js"]
+		"scripts": ["background.js"]
   },
 	"default_locale": "en",
   "permissions": [
 	"notifications",
-  "contextMenus",
+	"contextMenus",
 	"downloads",
-	"downloads.open"
+	"nativeMessaging"
   ]
 }
