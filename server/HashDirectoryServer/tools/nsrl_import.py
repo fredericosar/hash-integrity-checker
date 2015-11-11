@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import argparse
 import csv
 import os
@@ -9,6 +11,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('database_uri', help='SQLAlchemy database connection string')
     parser.add_argument('-z', '--zip', help='Path to RDS zip file to import')
+    parser.add_argument('-f', '--file-limit', type=int,
+                        help='Maximum number of files to import')
     args = parser.parse_args()
     
     if args.zip is None:
@@ -58,18 +62,21 @@ def main():
                     existing = existing.filter_by(file_name=file_name)
                 assert existing.count() <= 1
                 if existing.count() > 0:
-                    print('Ignore existing file', file_name, 'with sha1', sha1)
                     continue
+
                 n_added += 1
-                if n_added % 1000 == 0:
-                    print('.', end='', flush=True)
                 file = NSRLFile(sha1=sha1, md5=md5, crc32=crc32,
                                 file_name=file_name, file_size=file_size,
                                 product_code=product_code, special_code=special_code)
                 db.session.add(file)
+
+                if n_added % 1000 == 0:
+                    print('.', end='', flush=True)
+                if n_added >= args.file_limit:
+                    break
+
             print('\nCommitting', n_added, 'new files,', NSRLFile.query.count(), 'total')
             db.session.commit()
-
 
 
 if __name__ == '__main__':
