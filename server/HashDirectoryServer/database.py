@@ -5,6 +5,10 @@ db = flask.ext.sqlalchemy.SQLAlchemy(app)
 
 # http://www.nsrl.nist.gov/Documents/Data-Formats-of-the-NSRL-Reference-Data-Set-16.pdf
 
+class ValidationError(Exception):
+    def __init__(self, field, error):
+        self.errors = {field: error}
+
 class NSRLFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -27,3 +31,14 @@ class NSRLProduct(db.Model):
     # omit operating system, manufacturer, language(s)
     type = db.Column(db.String(50))
 
+class UserFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+
+    sha1 = db.Column(db.String(40), index=True, nullable=False)
+    md5 = db.Column(db.String(32), index=True)
+
+    file_name = db.Column(db.String(255), index=True, nullable=False)
+    source_url = db.Column(db.String(2048), index=True, nullable=False)
+
+    # TODO validation would be nice
