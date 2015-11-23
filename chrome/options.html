@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Test Extension Options</title>
+  <style>
+    body: { padding: 10px; }
+  </style>
+</head>
+
+<body>
+    <p>
+    <label><input type="checkbox" id="use-server">
+        Use directory server</label>
+    </p>
+
+    <p>
+    <label><input type="checkbox" id="submit-server">
+        Submit files to directory server</label>
+    </p>
+
+    <p>
+    <label>URI of directory server to use<br />
+        <input type="text" id="server-uri" style="width: 100%;"></label>
+    </p>
+
+    <button id="save">Save</button>
+    <span id="status"></span>
+
+    <script src="config.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,7 +1,5 @@
 "use strict";
 
-var activeFileNames = {};
-
 function notifyMe(filePath, hashes) {
     if (!Notification) {
         alert('Desktop notifications not available.'); 
@@ -37,35 +35,35 @@ chrome.downloads.onChanged.addListener(function(delta) {
             return;
         } else {
             var filePath = results[0].filename;
-            console.log(filePath);
+            console.log('Got download complete event for ' + filePath);
             var shortFileName = filePath.replace(/^.*[\\\/]/, '');
-            // TODO this should be configured by cmake
-            var hostName = "edu.utah.cs.cs6964.integrity_plugin";
+
             var port = null;
 
-            connectNative();
-            function connectNative()
+            function connectNative(hostName)
             {
                 console.log('Connecting to native application: ' + hostName);
                 port = chrome.runtime.connectNative(hostName);
                 port.onMessage.addListener(onMessage);
                 port.onDisconnect.addListener(onDisconnect);
-                sendNativeMessage({path: filePath});
-            }
-            function sendNativeMessage(msg) {
+
+                var msg = {path: filePath};
                 console.log('Sending message: ' + JSON.stringify(msg));
                 port.postMessage(msg);
-                console.log('Message sent...');
             }
             function onMessage(in_msg) {
-                console.log('Message received: ' + JSON.stringify(in_msg));
+                console.log('Response received: ' + JSON.stringify(in_msg));
                 notifyMe(shortFileName, in_msg);
             }
             function onDisconnect() {
                 console.log(chrome.runtime.lastError);
-                console.log('Disconnected from native application...');
+                console.log('Disconnected from native application');
                 port = null;
             }
+
+            read_config(function(items) {
+                connectNative(items.nativeHostName);
+            });
         }
     });
 });

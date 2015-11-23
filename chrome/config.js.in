@@ -1,0 +1,15 @@
+
+function read_config(f) {
+    // Configured at build-time by cmake
+    var DEFAULT_NATIVE_HOST_NAME = '@PLUGIN_NATIVE_NSPATH@';
+    var DEFAULT_DIRECTORY_SERVER_URI = '@DIRSERVER_DEFAULT_URI@';
+
+    var OPTIONS_DEFAULTS = {
+        useDirServer: true,
+        submitToDirServer: false,
+        dirServerUri: DEFAULT_DIRECTORY_SERVER_URI,
+        nativeHostName: DEFAULT_NATIVE_HOST_NAME,
+    };
+
+    chrome.storage.sync.get(OPTIONS_DEFAULTS, f);
+}

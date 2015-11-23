@@ -1,5 +1,21 @@
 # Setup
 
+Configuration and compilation is required to set some configuration in the
+code. Run CMake and adjust `PLUGIN_NATIVE_NSPATH` and `DIRSERVER_DEFAULT_URI`
+if desired.
+
+Try this:
+```
+$ mkdir build
+$ cd build
+$ ccmake ..
+<press 'c' to configure>
+<adjust options as desired>
+<press 'c' then 'g' to configure again and generate>
+<press 'q' to exit ccmake>
+$ cmake --build .
+```
+
 ## Windows
 
 `cmake --build . --target package` should generate a NSIS installer. It still

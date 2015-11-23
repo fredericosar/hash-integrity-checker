@@ -18,3 +18,4 @@ add_custom_command(
 add_custom_target(ChromeExtension ALL
                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/extension.crx)
 
+configure_file(config.js.in ${CMAKE_CURRENT_SOURCE_DIR}/config.js)

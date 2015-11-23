@@ -5,6 +5,8 @@ set(PLUGIN_NATIVE_NSPATH edu.utah.cs.cs6964.integrity_plugin
     CACHE STRING "Native messaging host identifier")
 set(EXTENSION_ID fomglakhabalmbenacmmigbjhcalmned
     CACHE STRING "Extension ID")
+set(DIRSERVER_DEFAULT_URI http://hash-dirserver.taricorp.net/api/
+    CACHE STRING "Default URI for hash directory server")
 
 if(WIN32)
     # WiX might be less bad than NSIS
