@@ -3,6 +3,8 @@ All API endpoints have a URL prefix of `api/`.
 All endpoints are searchable, with the [Flask-Restless][flask-restless] search
 interface.
 
+[flask-restless]: https://flask-restless.readthedocs.org/en/latest/searchformat.html
+
 `nsrl_file/<id>`
 :    a file in the NSRL RDS database. Each file is associated with no more than
      one product, but there may be multiple files for a given product.
@@ -39,7 +41,7 @@ interface.
 
       * `id`
       * `timestamp`: time the file was seen (when the download was begun or
-        perhaps finished.
+        perhaps finished).
       * `sha1`: SHA-1 hash of the file's contents, hex string
       * `md5`: MD5 hash of the file's contents, hex string
       * `file_name`: Name of the downloaded file in the filesystem.

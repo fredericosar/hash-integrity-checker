@@ -24,3 +24,9 @@ def run_app():
     database.db.create_all()
     app.run()
 
+@app.after_request
+def add_cors_header(response):
+    CORS = 'Access-Control-Allow-Origin'
+    if CORS not in response.headers:
+        response.headers[CORS] = '*'
+    return response
