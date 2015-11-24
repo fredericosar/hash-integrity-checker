@@ -8,7 +8,7 @@ function queryApi(path, onDone, filters) {
 
     var req = new XMLHttpRequest();
     req.addEventListener('load', function() {
-        onDone(JSON.parse(this.responeText));
+        onDone(JSON.parse(this.responseText));
     });
 
     read_config(function(config) {
@@ -27,33 +27,37 @@ function urlExistsInDirectory(sourceUrl, f) {
     ]);
 }
 
-function submitFileToDirectory(sourceUrl, fileName, sha1, md5) {
+function submitFileToDirectory(timestamp, sourceUrl, fileName, sha1, md5) {
+    console.log('Submitting file');
+    var req = new XMLHttpRequest();
 
+    read_config(function(config) {
+        req.open('POST', config.dirServerUri + 'user_file');
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify({
+            timestamp: timestamp,
+            sha1: sha1,
+            md5: md5,
+            file_name: fileName,
+            source_url: sourceUrl
+        }));
+    });
 }
 
-function notifyMe(filePath, hashes) {
+function notifyMe(title, message) {
     if (!Notification) {
         alert('Desktop notifications not available.'); 
         return;
-      }
+    }
 
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
     } else {
-        var body = filePath + "\n\n";
-        ['sha1', 'md5', 'sha256'].forEach(function(ht) {
-            if (hashes.hasOwnProperty(ht)) {
-                body += ht + ": " + hashes[ht];
-            }
-        });
-        var notification = new Notification('File Downloaded:', {
+        new Notification(title, {
             icon: 'icon48.png',
-            body: body,
+            body: message
         });
-        notification.onclick = function () {
-            window.open("https://www.virustotal.com/latest-scan/"+hashes['sha1']);
-        };
-  }
+    }
 }
 
 chrome.downloads.onChanged.addListener(function(delta) {
@@ -66,34 +70,62 @@ chrome.downloads.onChanged.addListener(function(delta) {
             return;
         } else {
             var download = results[0];
-            var filePath = download.filename;
             var sourceUrl = download.url;
+            var filePath = download.filename;
+            var fileName = filePath.replace(/^.*[\\\/]/, '');
             console.log('Got download complete event for ' + filePath);
-            var shortFileName = filePath.replace(/^.*[\\\/]/, '');
 
-            function connectNative(hostName)
-            {
-                console.log('Connecting to native application: ' + hostName);
-                var port = chrome.runtime.connectNative(hostName);
+            read_config(function(config) {
+                function connectNative(hostName) {
+                    console.log('Connecting to native application: ' + hostName);
+                    var port = chrome.runtime.connectNative(hostName);
 
-                port.onMessage.addListener(function(in_msg) {
-                    console.log('Response received: ' + JSON.stringify(in_msg));
-                    urlExistsInDirectory(sourceUrl, console.log);
-                });
+                    port.onMessage.addListener(function(in_msg) {
+                        console.log('Response received: ' + JSON.stringify(in_msg));
+                        var downloadSha1 = in_msg.sha1;
+                        var downloadMd5 = in_msg.md5;
 
-                port.onDisconnect.addListener(function() {
-                    console.log(chrome.runtime.lastError);
-                    console.log('Disconnected from native application');
-                    port = null;
-                });
+                        if (!config.useDirServer)
+                            return;
 
-                var msg = {path: filePath};
-                console.log('Sending message: ' + JSON.stringify(msg));
-                port.postMessage(msg);
-            }
+                        urlExistsInDirectory(sourceUrl, function(response) {
+                            // TODO response might be paginated
+                            if (response.objects.length == 0) {
+                                notifyMe(fileName, "No record of files from source URL.");
+                            } else {
+                                var nMatches = 0;
+                                response.objects.forEach(function(x) {
+                                    if (x.sha1 == downloadSha1)
+                                        nMatches += 1;
+                                });
+                                notifyMe(fileName, "Found " + nMatches +
+                                        " record(s) matching this file (" +
+                                        Math.floor(nMatches / response.objects.length) +
+                                        "% agreement).");
+                            }
 
-            read_config(function(items) {
-                connectNative(items.nativeHostName);
+                            // Submit a record of our file now, if desired
+                            if (config.submitToDirServer) {
+                                submitFileToDirectory(download.starttime, sourceUrl,
+                                                      fileName, downloadSha1, downloadMd5);
+                            } else {
+                                console.log('Skipping submission due to configuration');
+                            }
+                        });
+                    });
+
+                    port.onDisconnect.addListener(function() {
+                        console.log(chrome.runtime.lastError);
+                        console.log('Disconnected from native application');
+                        port = null;
+                    });
+
+                    var msg = {path: filePath};
+                    console.log('Sending message: ' + JSON.stringify(msg));
+                    port.postMessage(msg);
+                }
+
+                connectNative(config.nativeHostName);
             });
         }
     });
