@@ -25,8 +25,11 @@ def run_app():
     app.run()
 
 @app.after_request
-def add_cors_header(response):
-    CORS = 'Access-Control-Allow-Origin'
-    if CORS not in response.headers:
-        response.headers[CORS] = '*'
+def add_cors_headers(response):
+    origin = 'Access-Control-Allow-Origin'
+    headers = 'Access-Control-Allow-Headers'
+    if origin not in response.headers:
+        response.headers[origin] = '*'
+    if headers not in reasponse.headers:
+        response.headers[headers] = 'Content-Type'
     return response
