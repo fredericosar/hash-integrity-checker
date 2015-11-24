@@ -30,6 +30,6 @@ def add_cors_headers(response):
     headers = 'Access-Control-Allow-Headers'
     if origin not in response.headers:
         response.headers[origin] = '*'
-    if headers not in reasponse.headers:
+    if headers not in response.headers:
         response.headers[headers] = 'Content-Type'
     return response
