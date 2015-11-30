@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="131.09692mm"
+   height="119.84851mm"
+   viewBox="0 0 464.51666 424.66007"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="system.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="282.99198"
+     inkscape:cy="164.23933"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1029"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="5"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-16.380437,-22.814334)">
+    <path
+       sodipodi:type="spiral"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3333"
+       sodipodi:cx="268.57144"
+       sodipodi:cy="215.21936"
+       sodipodi:expansion="1"
+       sodipodi:revolution="3"
+       sodipodi:radius="240.22099"
+       sodipodi:argument="-21.522182"
+       sodipodi:t0="0"
+       d="m 268.57144,215.21936 c -10.74395,-5.44359 2.03717,-17.1683 9.04761,-17.85715 18.99786,-1.86672 29.27265,19.88575 26.66669,35.95237 -4.66146,28.7394 -36.72154,42.42498 -62.85712,35.47623 -38.35502,-10.19758 -55.86664,-53.74941 -44.28577,-89.76188 15.43547,-47.99896 70.8407,-69.42554 116.66663,-53.09531 57.66727,20.54992 83.04387,87.96105 61.90485,143.57139 C 350.11216,336.85658 270.61678,366.20138 205.23818,340.2194 128.19177,309.60054 94.867879,217.97533 125.71425,142.83849 161.32761,56.090043 265.11154,18.77996 349.99992,54.505022 446.45549,95.098108 487.75669,211.06024 447.14293,305.69545 401.58043,411.86185 273.42634,457.15773 169.04775,411.648 53.167723,361.12357 3.8745023,220.76744 54.285657,106.64806" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="text3335"
+       sodipodi:linespacing="125%"><textPath
+         xlink:href="#path3333"
+         id="textPath3342"><tspan
+   id="tspan3337">             I'm a figure wheeeeeee</tspan></textPath></text>
+  </g>
+</svg>
