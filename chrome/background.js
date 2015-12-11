@@ -100,7 +100,7 @@ chrome.downloads.onChanged.addListener(function(delta) {
                                 });
                                 notifyMe(fileName, "Found " + nMatches +
                                         " record(s) matching this file (" +
-                                        Math.floor(nMatches / response.objects.length) +
+                                        Math.floor(nMatches * 100 / response.objects.length) +
                                         "% agreement).");
                             }
 
