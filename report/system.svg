@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="61.296318mm"
-   height="44.118114mm"
-   viewBox="0 0 217.19168 156.32403"
+   width="112.03647mm"
+   height="44.118111mm"
+   viewBox="0 0 396.97962 156.32402"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -181,8 +181,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="194.34449"
-     inkscape:cy="79.322029"
+     inkscape:cx="136.48734"
+     inkscape:cy="79.322012"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -203,7 +203,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -211,7 +211,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-110.77917,-24.920974)">
+     transform="translate(-110.77918,-24.920974)">
     <rect
        style="fill:none;fill-opacity:1;stroke:#aa0000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6, 6;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4136"
@@ -402,7 +402,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:398.75003565px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       style="font-style:normal;font-weight:normal;font-size:398.75003052px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="427.20773"
        y="81.602142"
        id="text4248"
@@ -411,7 +411,7 @@
          id="tspan4250"
          x="427.20773"
          y="81.602142"
-         style="font-size:398.75003565px;" /></text>
+         style="font-size:398.75003052px" /></text>
     <g
        id="g4297"
        transform="translate(-1.0101526,10.859141)">
