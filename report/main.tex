@@ -28,7 +28,7 @@
 \date{}
 
 %make title bold and 14 pt font (Latex default is non-bold, 16 pt)
-\title{\Large \bf Wonderful : A Terrific Application and Fascinating Paper}
+\title{\Large \bf HashChecker : An Integrity Checker for Downloads on your Browser}
 
 \author{
 {\rm Joshua Dawson}
@@ -46,59 +46,76 @@
 
 \subsection*{Abstract}
 
-Blah blah blah.
+Cryptographic hash functions are often used to verify the integrity of files downloaded from the internet, but are rarely published by distributors and rarely checked by users even when available. We present a browser extension and associated infrastructure for automating hash checking of all downloaded files, suitable for use no matter the availability of an official hash for verification and providing a dataset useful for following files over time on the greater Internet.
 
 \section{Introduction}
 
-Blah blah blah.
+Using cryptographic hash functions to compute file hashes is nothing new to the the Computer Security community; however, generating a Google Chrome extension to assist the user in verifying the authenticity of a file is novel. This inspired the development of Hash Checker. Hash Checker is a Google Chrome extension that assists the user in making informed decisions regarding the authenticity of a downloaded file. Hash Checker computes the hash on a downloaded file and checks the hash against a database of known hashes to confirm that the download is what the user had intended.
+	The primary goal of Hash Checker is to provide the user with real time file verification feedback for any downloaded file. This ability to check file integrity should mitigate the risk of a user opening a file that has been corrupted with malware. Resulting in an overall safer computing environment for the user.
+	Existing browser extensions only allow the user to compute the hash for text input or a file they manually select from the local file-system. Once the hash is calculated and displayed to the user, the burden is then placed on the user to conduct the file authenticity check. This usually involves a visual comparison between the computed hash displayed on the screen and a hash provided by the web page serving the file. This may cause a problem if the web page serving the file does not display their own calculated hash for the file they are serving. Our extension, Hash Checker, is different from previous extensions in that, it computes the hash automatically for a downloaded file and then checks the hash against a database of known file hashes and then provides feedback to the user on the results of the check. This process is automated in such a way that it does not place any additional burden on the user. It provides feedback on the authenticity of a file but ultimately still allows the user to choose whether they trust that the file has not been tampered with.
 
 \section{Related Work}
 
-Blah blah blah.
-
-Things like the SSL Observatory~\cite{ssl-observatory} and
-VirusTotal's plugins~\cite{vtzilla,vtchromizer,vtexplorer}.
+We will explain more about SSL Observatory~\cite{ssl-observatory} and VirusTotal's plugins~\cite{vtzilla,vtchromizer,vtexplorer}. Also, we have as related work ``An Evaluation of the Google Chrome Extension Security Architecture''~\cite{180206} and ``Automating phishing website identification through deep MD5 matching''~\cite{Wardman}.
 
 \section{Design}
 
-Here's a typical figure reference.  The figure is centered at the
-top of the column.  It's scaled.  It's explicitly placed.  You'll
-have to tweak the numbers to get what you want.\\
+The design of our tool has gone through a number of iterations, despite our design goals remaining fairly consistent through the design process. The following is a list of our design goals for this project:
 
+\begin{enumerate}
+\item There should be no restrictions placed on the type of file or the download location on the local file system.
+\item The hashing of the file should automatically occur as soon as the file is downloaded without requiring additional input from the user after the download request is initiated.
+\item The tool should verify the downloaded file for integrity and authenticity from a known file hash database.
+\item The tool should provide feedback to the user based on the results of the file check.
+\item The tool should not “quarantine” a file that is not found in the known file hash database but rather provide meaningful feedback to the user so that they can make an informed decision what to do with the downloaded file.
+\end{enumerate}
+
+Google Chrome’s architecture has been the driving force for many of our design decisions for the development of the tool. The sandboxed environment has caused several issues. For example, Google Chrome extensions are allowed access to the chrome.downloads API. This allows the extension access to download events and can even fetch the download path on the local file system for recently downloaded files. However, Google Chrome extensions do not have access to the chrome.fileSystem API. This means that even though the extension can know the path to the downloaded file on the local filesystem, it is not allowed to have any interaction with the downloaded file. The first iteration of our design included just a single Chrome extension. We managed to skirt the issue of not having access to the chrome.fileSystem API by forcing the user to download any file to a downloads folder located in the install folder of the extension. This solves the problem of not having access to the chrome.fileSystem API because extensions do have access to files that are located in their own install folder. Obviously this conflicts with our first design goal. By forcing the user to download to a specific folder it ruins the flexibility and usability of the extension. Furthermore, the extension’s install directory is only available if the extension is loaded as an unpacked extension, which requires the user to load the unpacked extension in developer mode and precludes the option to deploy our extension to the Chrome Web Store. The restrictions placed by Google on the accessibility of a Chrome extension’s use of certain APIs meant we would have to explore another route to meet this design challenge.
+The second iteration of our design utilized a combination of a Chrome extension and a Chrome app. The Chrome extension had access to the chrome.downloads API, for which the app does not, and the Chrome app had access to the chrome.fileSystem API, for which the extension does not. By using the combination of the extension and the app we were hoping to overcome the challenges of the sandboxed environment place on each type. The extension would listen for the file download to complete and then it would wake up the app and pass a message to the application containing the file path to the downloaded file. The app would receive the message and display it as a prompt to the user. This is where another challenge was presented. Even though Chrome apps have access to the chrome.fileSystem API, they require a user action to be able to access the local filesystem. By design this is to prevent malicious apps from programatically modifying files on the local filesystem without the user’s consent. The user action that is defined in the documentation for the API generally relates to an open file dialog that allows the user to select a file. This action of physically selecting a file demonstrates that the user is giving permission to the application to access the local filesystem. By requiring the user to open the file they just downloaded, this iteration of our design is very comparable to previous hashing applications available in the Chrome Web Store. Similarly, our app could be used as a stand alone app if the user chooses not to install the extension. The only additional functionality that the extension brings to this design is that it intercepts the download completed event, automatically opens the application for the user, and then displays to the user the path to the most recently downloaded file. This iteration does not meet our second design goal due to the necessity of an additional prompt for the downloaded file location. Originally we had desired to incorporate the entire tool as an extension; however, we learned over time that it was going to require native messaging with a native application to achieve all of our design goals.
+The final iteration of our tool utilizes native messaging between our Chrome extension and a native application. The Chrome extension receives the download completed event from the chrome.downloads API, wakes up the native application, and transfers a message containing the file path to the recently downloaded file. The native application then computes the hash of the file, compares the hash to a known file hash database, and then sends a message back to the extension with the results of the hashing and file checking. The extension then opens a Chrome notification window to display the results from the native application. This final iteration achieves all of our design goals. Our proposed Google Chrome extension allows the user to seamlessly download any file from any website to any location on the local filesystem. The hash is calculated and verified against a known file hash database and the feedback results are relayed to the user via a Chrome notification window.
+Hash Checker is not a virus or malware scanning tool. By our specification Hash Checker is only conducting a file integrity and authenticity check by comparing the hash of the file against a known file hash database. The tool is not scanning the downloaded file for any malicious behavior as compared with extensions that are bundled with popular commercial anti-virus software. If a malicious file is found by a virus-scanner it is generally moved to a “quarantine” zone. It is the intent of Hash Checker to only hash the downloaded file and provide meaningful feedback to the user. It is left up to the user to decide, based upon the feedback, whether the downloaded file is the same file the user intended to download. It is still recommended to run anti-virus in conjunction with Hash Checker for a complete safe computing solution.
 % you can also use the wonderful epsfig package...
-\begin{figure}[h]
-    \includegraphics[width=\columnwidth]{system}
-    \caption{This is a figure.}
-    \label{fig:one}
-\end{figure}
+%\begin{figure}[h]
+%    \includegraphics[width=\columnwidth]{system.svg}
+%    \caption{This is a figure.}
+%    \label{fig:one}
+%\end{figure}
 
-This text came after the figure, so we'll casually refer to \autoref{fig:one}
-as we go on our merry way.
+\section{Threat Model}
 
-\section{Results}
+What does hash checking guard against? Inadvertent corruption, MITM-based tampering, compromised servers (tampering again). We protect against corruption when official hashes are published, and can sometimes detect either flavor of tampering depending on time-related properties (how long it’s been there, how popular the file is).
 
-Do we need this section?
+In case of a changed file on a server, if the published hashes are not modified the difference will be noticed. If published hashes are updated (suggesting a savvy attacker or actual update by the publisher), the difference between records in the directory and published hashes will be noted. The user must still decide whether they trust the change.
 
 \section{Discussion}
 
-Blah blah blah.
+Few users ever take advantage of published hashes when downloading files, and those who do usually only verify hashes on certain classes of files (particularly disk images). Built-in integrity checks such as checksums embedded in many kinds of archive files offer some confidence that a file has not been inadvertently corrupted, but are generally not robust against malicious tampering.
+
+In many cases checksums (or cryptographic hashes) are not even published by the publisher of a file, or are not provided via the distribution medium such as a public file hosting web site. Our system provides a back-channel for verification of files, provided sufficient data.
+
+Code signing systems can provide stronger protections against tampering in-transit, such as Authenticode~\cite{Authenticode} on Windows and Gatekeeper ~\cite{Gatekeeper} on OS X, both of which provide strong cryptographic guarantees regarding the authenticity for application packages. Both of these systems are limited, however, in that they require the user put trust in a third party (a certificate authority or Apple, respectively) that malicious parties cannot resign modified applications after tampering with them.
+
+A sufficiently motivated  and savvy attacker could simply submit hashes of a tampered file to the directory to attempt to get users to accept that as the true hash. Such tampering might be detectable, but our current design of the system does not include any such functionality. At the directory, it is also possible to attempt to reject invalid hashes via any number of methods. If the methods applied to reject certain reports are public it becomes easier to work around them given a motivated attacker, a weakness of the open architecture of the system. It would thus be advantageous not to expose the details of rejections (make the API always report success). It is likely possible to implement a sort of trust system for clients reporting file metadata to the directory, which would also help mitigate the risk of directory-poisoning attacks.
+
+The extension does however allow users to run their own directory server and specify where it can be reached. Running a non-public directory server is an effective defense against directory attacks, since an attacker capable of reaching a private directory is likely also capable of directly compromising a target without relying on tampering with downloaded files.
+
+The directory server is potentially interesting for study of how often files are updated, possibly detecting tampering, measuring error rates, other things.
 
 \section{Limitations}
 
-Blah blah blah.
+Hashing performance may be poor due to choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized).
 
-\section{Conclusions}
+Setup is not as trivial as we would have liked. Requires installation of a native component, and actually providing a useful installer requires publishing the extension on the Chrome Web Store, which we have not done because it costs money.
 
-Blah blah blah.
+Currently only supports Chrome (more generally, Chromium derivatives). There’s no technical reason we can’t support other browsers (Firefox, IE/Edge), but we chose to focus effort on only one implementation.
+
+Currently depends on  user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that’s not great. We also assume honest reports, as noted in the discussion.
+
+\section{Future Work}
+
+Admittedly the final result of our tool is not exactly what we had originally set out to accomplish. We had wanted to create a standalone Google Chrome extension that would allow the user to download a file, compute the hash, and give feedback about the authenticity of the file to the user. As we have discussed before, the feasibility of being able to accomplish all of this within a Chrome extension alone does not appear to be possible by design of the Chrome sandboxed architecture. Through additional research into Chrome extension implementation we were able to design a Chrome extension that uses native messaging to a native application to achieve all of our design goals.
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{bibliography}}
 
 \end{document}
-
-
-
-
-
-
-
