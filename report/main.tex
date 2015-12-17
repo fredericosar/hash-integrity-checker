@@ -41,6 +41,8 @@ Our extension, Hash Checker, is different from previous extensions in that it co
 
 TODO Also, we have as related work ``An Evaluation of the Google Chrome Extension Security Architecture''~\cite{180206} and ``Automating phishing website identification through deep MD5 matching''~\cite{Wardman}.
 
+One of the challenges of creating a Google Chrome extension is navigating the Google Chrome extension security architecture. For the extension, we wanted to make sure that we were requesting the correct permissions to achieve our design goals while ensuring that we were not using unnecessary permissions or requesting more access than necessary for a permission. For example, for the chrome.fileSystem API do we need read access or do we need write and directory access as well? [I WILL EXPOUND ON THIS] Previous researchers have detailed the security vulnerability involving the over-provisioning of permissions. [NEEDS CITATION TO An Evaluation of the Google Chrome Extension Security Architecture]
+
 The Electronic Frontier Foundation's SSL Observatory~\cite{ssl-observatory} plays a role
 similar to some aspects of the directory server in our system, where users of a browser
 extension (HTTPS Everywhere~\cite{https-everywhere}) may opt to have the browser
