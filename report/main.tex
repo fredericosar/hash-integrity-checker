@@ -77,7 +77,7 @@ Hash Integrity Checker is not a virus or malware scanning tool. By our specifica
 
 \begin{figure}
     \centering
-    \fbox{\includegraphics[width=0.45\columnwidth,keepaspectratio]{workflow-vertical.png}}
+    \fbox{\includegraphics[width=0.5\columnwidth,keepaspectratio]{workflow-vertical.png}}
     \caption{Application Workflow}
     \label{fig:appflow}
 \end{figure}
@@ -134,6 +134,7 @@ that files should be hashed automatically on download completion without user in
 Originally we had desired to incorporate the entire tool as an extension; however, we learned
 over time that it was going to require native messaging with a native application to achieve all
 of our design goals.
+
 
 The final iteration of our tool utilizes native messaging between our Chrome extension and a
 native application as illustrated in \autoref{fig:sysflow}. The Chrome extension receives the download completed event from the
@@ -210,7 +211,17 @@ The directory server's operation and features are discussed in \autoref{sec:dirs
 \section{Directory Server}
 \label{sec:dirserver}
 
-The directory server provides access to a database of observed files, including their
+An integral part of our design was to have the directory server be a separate black box component to our extension. Our extension should be able to send the hash calculated by the native application, as well as any other pertinent file identification information such as file name and download URL, to the directory server. The directory server would then check the transferred arguments against its internal database and produce usable feedback to send back to the extension to notify the user. This model allows the user to decide what directory server is most trustworthy for their particular application. In this section we provide two examples of directory servers that were used in the development of our application.
+
+\subsection{VirusTotal Directory Server}
+
+The first directory server we linked to was the VirusTotal public API. VirusTotal is a free online service that allows a user to upload a file and have it checked against the output obtained from multiple antivirus products. VirusTotal itself is not a standalone antivirus solution, it considers itself to be an information aggregator from other antivirus products~\cite{vtabout}. One benefit for our application is that VirusTotal keeps a record of the associated hashes of files that are uploaded to their system to be checked. This provides us with an easy proof of concept solution to provide feedback for our extension. This allows us to test our extension against a working database that is already preloaded with a large sample of file hashes.
+
+One of the methods for looking up a file using the VirusTotal public API is by sending VirusTotal the SHA-256 Hash of the file. This is the method we use in our application to verify if the user's downloaded file is contained in the VirusTotal database. We chose this method since our native application has already calculated the hash of the file before connecting to a directory server. If the file is in the database we return the file name and detection results from VirusTotal back to the extension. The extension then creates a Chrome notification box that displays the results to the user. If the user clicks on the Chrome notification box the VirusTotal web page associated with the hash of their downloaded file is automatically opened so the user can see the full VirusTotal results. If the file hash is not in the VirusTotal database the Chrome notification displays the SHA-256 hash along with a message notifying the user that the file hash is not in the database. Whether the file hash is contained in the database or not it is left up to the user to decide if they trust the integrity of the file. The hash is displayed if the user wants to seek a different opinion from an alternate file hashing service or if they are able to make a comparison with a hash provided by another source; for example, a hash provided directly by the serving web page for the file.
+
+\subsection{Custom Directory Server}
+
+Our directory server provides access to a database of observed files, including their
 source and hash digests, over an HTTP API suitable for use by the browser extension.
 It encapsulates two logical data sources: the NSRL RDS and collected files.
 
@@ -245,7 +256,7 @@ an attack or integrity failure.
 
 \section{Threat Model}
 
-This section needs revision and fleshign out.
+This section needs revision and fleshing out.
 
 What does hash checking guard against? Inadvertent corruption, MITM-based tampering, compromised servers (tampering again). We protect against corruption when official hashes are published, and can sometimes detect either flavor of tampering depending on time-related properties (how long it’s been there, how popular the file is).
 
@@ -257,7 +268,7 @@ network can't have a private directory attacked easily.
 
 \section{Discussion}
 
-This sectino needs revision and fleshing out.
+This section needs revision and fleshing out.
 
 Few users ever take advantage of published hashes when downloading files, and those who do usually only verify hashes on certain classes of files (particularly disk images). Built-in integrity checks such as checksums embedded in many kinds of archive files offer some confidence that a file has not been inadvertently corrupted, but are generally not robust against malicious tampering.
 
@@ -284,14 +295,15 @@ Currently only supports Google Chrome (more generally, Chromium derivatives). Th
 Currently depends on  user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that’s not great. We also assume honest reports, as noted in the discussion.
 
 \section{Evaluation}
+Admittedly the final result of our tool is not exactly what we had originally set out to accomplish. We had wanted to create a standalone Google Chrome extension that would allow the user to download a file, compute the hash, and give feedback about the authenticity of the file to the user. As we have discussed before, the feasibility of being able to accomplish all of this within a Chrome extension alone does not appear to be possible by design of the Chrome sandboxed architecture. Through additional research into Chrome extension implementation we were able to create a Chrome extension that uses native messaging between our extension and a native application to achieve all of our design goals.
 
-For three weeks we were able to test our extension in a live environment. The extension was installed for the Google Chrome browser and was used with every download during that time period as part of our regular web browsing behavior. By design, the extension was actually useful for verifying the integrity of downloaded files. The feedback provided in the Chrome notification box allowed us to make an informed decision whether we wanted to accept or discard the downloaded file. The extension did not cause any distraction or performance limitation to the overall web browsing experience.
+For this project we would have preferred to do a user study to measure the viability of using Hash Integrity Checker on a consistent basis. Due to the compressed timeline of this project we were not able to implement the final product with enough time to execute a formal user study. We were able to do an internal test of our system by having the extension installed and running on our machines.
+
+For three weeks we were able to test our extension in a live environment. The extension was installed for the Google Chrome browser and was used with every download during that time period as part of our regular web browsing behavior. As expected, and by design, the extension was actually useful for verifying the integrity of downloaded files. The feedback provided in the Chrome notification box allowed us to make an informed decision whether we wanted to accept or discard the downloaded file. The extension did not cause a distraction or reduction in performance to the overall web browsing experience. We leave deploying Hash Integrity Checker on a larger scale, and conducting a formal study of the user experience with our extension, as future work.
 
 \section{Future Work}
 
-This section needs revision.
-
-Admittedly the final result of our tool is not exactly what we had originally set out to accomplish. We had wanted to create a standalone Google Chrome extension that would allow the user to download a file, compute the hash, and give feedback about the authenticity of the file to the user. As we have discussed before, the feasibility of being able to accomplish all of this within a Chrome extension alone does not appear to be possible by design of the Chrome sandboxed architecture. Through additional research into Chrome extension implementation we were able to design a Chrome extension that uses native messaging to a native application to achieve all of our design goals.
+This section needs content.
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{bibliography}}
