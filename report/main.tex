@@ -41,7 +41,7 @@ Our extension, Hash Integrity Checker, is different from previous extensions in 
 
 TODO Also, we have as related work ``Automating phishing website identification through deep MD5 matching"~\cite{Wardman}.
 
-One of the challenges of creating a Google Chrome extension is navigating the Google Chrome extension security architecture. For the extension, we want to make sure we are requesting the correct permissions to achieve our design goals while ensuring that we are not using unnecessary permissions or requesting more access than is necessary for a permission. For example, when using the chrome.fileSystem API, and associated requested permission, is read access sufficient or does the application need write access as well? Previous researchers have detailed the security vulnerability involving the over-provisioning of permissions~\cite{180206}. For our extension we want to follow the guidelines set forth in their research to ensure we reduce the attack surface of our extension.
+One of the challenges of creating a Google Chrome extension is navigating the Google Chrome extension security architecture. For the extension, we want to make sure we are requesting the correct permissions to achieve our design goals while ensuring that we are not using unnecessary permissions or requesting more access than is necessary for a permission. For example, when using the \texttt{chrome.fileSystem} API, and associated requested permission, is read access sufficient or does the application need write access as well? Previous researchers have detailed the security vulnerability involving the over-provisioning of permissions~\cite{180206}. For our extension we want to follow the guidelines set forth in their research to ensure we reduce the attack surface of our extension.
 
 The Electronic Frontier Foundation's SSL Observatory~\cite{ssl-observatory} plays a role
 similar to some aspects of the directory server in our system, where users of a browser
@@ -258,45 +258,67 @@ Changes that have been corroborated over longer periods of time are less
 likely to be the unexpected, whereas a sudden change in a file's contents may indicate
 an attack or integrity failure.
 
-\section{Threat Model}
+\section{Threat Protection}
 
-This section needs revision and fleshing out.
+Hash checking of downloaded files is unable to protect against sophisticated attacks, but is
+suitable for guarding against accidental corruption or malicious tampering by attackers with
+limited resources. For example, an attacker may be able to tamper with the version of a
+program binary stored in a CDN, but without the ability to also change hash digests provided
+on a download page, the tampering will be detected.
 
-What does hash checking guard against? Inadvertent corruption, MITM-based tampering, compromised servers (tampering again). We protect against corruption when official hashes are published, and can sometimes detect either flavor of tampering depending on time-related properties (how long it’s been there, how popular the file is).
+In addition to lowering the barrier for users to verify hashes, the use of a directory
+server can protect against more sophisticated attacks where the attacker can also
+tamper with a download page, for example. If the published hash is not ultimately trusted,
+a difference between the published hash and entries in the directory may be noted.
 
-In case of a changed file on a server, if the published hashes are not modified the difference will be noticed. If published hashes are updated (suggesting a savvy attacker or actual update by the publisher), the difference between records in the directory and published hashes will (could) be noted. The user must still decide whether they trust the change.
+An attacker with the capability to tamper with a server's contents in the above way may
+also have knowledge that a targeted victim uses our system, and attempt to poison the
+directory in order to make their tampered version of a file appear to be legitimate. The
+current system allows users to specify a custom directory server, which can mitigate the
+risk of a directory-poisoning attack by making a directory difficult to reach.
 
-Attackers might try to poison the directory. Mitigated somewhat by making
-it possible to use a custom directory server, so eg an organization running a large private
-network can't have a private directory attacked easily.
+For example,
+an organization with many clients on a local network might choose to run a private directory
+server which would require that an attacker gain access to the private network (probably
+a higher-value target anyway) before they can attack the directory.
+Further work on the directory server might implement logic to attempt to detect
+poisoning attacks, such as rate-limiting submissions from subsets of all clients.
 
 \section{Discussion}
 
-This section needs revision and fleshing out.
+Few users ever take advantage of published hashes when downloading files, and those
+who do usually only verify hashes on certain classes of files such as disk images.
+Built-in integrity checks in many kinds of archive files
+offer some confidence that a file has not been inadvertently corrupted,
+but are generally not robust against malicious tampering.
 
-Few users ever take advantage of published hashes when downloading files, and those who do usually only verify hashes on certain classes of files (particularly disk images). Built-in integrity checks such as checksums embedded in many kinds of archive files offer some confidence that a file has not been inadvertently corrupted, but are generally not robust against malicious tampering.
+In many cases checksums (or cryptographic hashes) are not even published by the
+publisher of a file, or are not provided via the distribution medium such as a public
+file hosting web site. Our system provides a back-channel for verification of files,
+provided sufficient history available for analysis.
 
-In many cases checksums (or cryptographic hashes) are not even published by the publisher of a file, or are not provided via the distribution medium such as a public file hosting web site. Our system provides a back-channel for verification of files, provided sufficient data.
+Code signing systems can provide stronger protections against tampering in-transit,
+such as Authenticode~\cite{Authenticode} on Windows and Gatekeeper
+~\cite{Gatekeeper} on OS X, both of which provide strong cryptographic
+guarantees regarding the authenticity for application packages. Both of these
+systems are limited, however, in that they require the user put trust in a third party
+(a certificate authority or Apple, respectively) that malicious parties cannot resign
+modified applications after tampering with them.
 
-Code signing systems can provide stronger protections against tampering in-transit, such as Authenticode~\cite{Authenticode} on Windows and Gatekeeper ~\cite{Gatekeeper} on OS X, both of which provide strong cryptographic guarantees regarding the authenticity for application packages. Both of these systems are limited, however, in that they require the user put trust in a third party (a certificate authority or Apple, respectively) that malicious parties cannot resign modified applications after tampering with them.
+With the presence of an option for user choice in directory server, a user
+is able to choose which directory (if any) they wish to trust, with the option
+to run their own if desired -- trust need only extend as far as a user is willing
+to go, especially in that no single third-party must be trusted by the user.
 
-A sufficiently motivated  and savvy attacker could simply submit hashes of a tampered file to the directory to attempt to get users to accept that as the true hash. Such tampering might be detectable, but our current design of the system does not include any such functionality. At the directory, it is also possible to attempt to reject invalid hashes via any number of methods. If the methods applied to reject certain reports are public it becomes easier to work around them given a motivated attacker, a weakness of the open architecture of the system. It would thus be advantageous not to expose the details of rejections (make the API always report success). It is likely possible to implement a sort of trust system for clients reporting file metadata to the directory, which would also help mitigate the risk of directory-poisoning attacks.
+The records stored in the directory server could be useful for \emph{post-facto} analysis
+of files on the Internet. Tampering which may not be immediately detected could be
+observed based on submitted directory entries at any later time, or information
+regarding the frequency of users downloading particular files might offer useful information
+to publishers regarding which potential targets are more worth spending effort
+to support verification. The possibilities for mining of the directory are many, but
+may be limited by the choice to make submission to the directory opt-in.
 
-The extension does however allow users to run their own directory server and specify where it can be reached. Running a non-public directory server is an effective defense against directory attacks, since an attacker capable of reaching a private directory is likely also capable of directly compromising a target without relying on tampering with downloaded files.
-
-The directory server is potentially interesting for study of how often files are updated, possibly detecting tampering, measuring error rates, other things.
-
-\section{Limitations}
-
-This section needs revision and fleshing out.
-
-Hashing performance may be poor due to choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized).
-
-Setup is not as trivial as we would have liked. Requires installation of a native component, and actually providing a useful installer requires publishing the extension on the Chrome Web Store, which we have not done because it costs money.
-
-Currently only supports Google Chrome (more generally, Chromium derivatives). There is no technical reason we can't support other browsers (Firefox, IE/Edge), but we chose to focus effort on only one implementation.
-
-Currently depends on  user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that’s not great. We also assume honest reports, as noted in the discussion.
+Link to our source code on github?
 
 \section{Evaluation}
 Admittedly the final result of our tool is not exactly what we had originally set out to accomplish. We had wanted to create a standalone Google Chrome extension that would allow the user to download a file, compute the hash, and give feedback about the authenticity of the file to the user. As we have discussed before, the feasibility of being able to accomplish all of this within a Chrome extension alone does not appear to be possible by design of the Chrome sandboxed architecture. Through additional research into Chrome extension implementation we were able to create a Chrome extension that uses native messaging between our extension and a native application to achieve all of our design goals.
@@ -307,7 +329,17 @@ For three weeks we were able to test our extension in a live environment. The ex
 
 \section{Future Work}
 
-This section needs content.
+This section needs revision.
+
+Hashing performance may be poor due to choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized).
+
+Setup is not as trivial as we would have liked. Requires installation of a native component, and actually providing a useful installer requires publishing the extension on the Chrome Web Store, which we have not done because it costs money.
+
+Currently only supports Google Chrome (more generally, Chromium derivatives). There is no technical reason we can't support other browsers (Firefox, IE/Edge), but we chose to focus effort on only one implementation.
+
+Currently depends on  user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that’s not great. We also assume honest reports, as noted in the discussion.
+
+Support public-key verification (PGP) in the future, which gives stronger guarantees than simply checking hashes.
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{bibliography}}
