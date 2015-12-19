@@ -184,7 +184,7 @@ contents of the referring page.
 
 For example, some file hosts publish checksums directly on the download pages. The
 extension could match the referring URL against those matching a known host, then
-scrape the referring page to retrieve the checksums value. In cases where no host-specific
+scrape the referring page to retrieve the checksum's value. In cases where no host-specific
 rules match, the extension may attempt to retrieve the directory containing the
 downloaded file and search for files with names commonly used for checksums. For
 example, a download of \texttt{https://example.com/linux/linux.iso} might prompt the
@@ -267,8 +267,8 @@ program binary stored in a CDN, but without the ability to also change hash dige
 on a download page, the tampering will be detected.
 
 In addition to lowering the barrier for users to verify hashes, the use of a directory
-server can protect against more sophisticated attacks where the attacker can also
-tamper with a download page, for example. If the published hash is not ultimately trusted,
+server can protect against more sophisticated attacks, such as when the attacker can also
+tamper with a download page. If the published hash is not ultimately trusted,
 a difference between the published hash and entries in the directory may be noted.
 
 An attacker with the capability to tamper with a server's contents in the above way may
@@ -281,8 +281,9 @@ For example,
 an organization with many clients on a local network might choose to run a private directory
 server which would require that an attacker gain access to the private network (probably
 a higher-value target anyway) before they can attack the directory.
-Further work on the directory server might implement logic to attempt to detect
-poisoning attacks, such as rate-limiting submissions from subsets of all clients.
+Further work on the directory server might implement logic to attempt to detect and prevent
+poisoning attacks, such as by rate-limiting submissions from subsets of all clients when
+their actions appear suspicious.
 
 \section{Discussion}
 
@@ -300,7 +301,7 @@ provided sufficient history available for analysis.
 Code signing systems can provide stronger protections against tampering in-transit,
 such as Authenticode~\cite{Authenticode} on Windows and Gatekeeper
 ~\cite{Gatekeeper} on OS X, both of which provide strong cryptographic
-guarantees regarding the authenticity for application packages. Both of these
+guarantees regarding the authenticity of application packages. Both of these
 systems are limited, however, in that they require the user put trust in a third party
 (a certificate authority or Apple, respectively) that malicious parties cannot resign
 modified applications after tampering with them.
@@ -332,18 +333,25 @@ For three weeks we were able to test our extension in a live environment. The ex
 We have presented our solution to protect against attacks that compromise integrity of a downloaded file. The solution is built using multiple components that work as standalone software but work together as they are connected directly.
 
 Much work remains. It is noticeable that our hashing performance may be poor due the choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized). We also hope to decrease complexity by simplifying the installation of the tool. 
-
-Unfortunately, setup is not as trivial as we would have liked. It requires installation of a native component and, to provide a useful installer it would be necessary to publish the extension on the Chrome Web Store, which we have not done because it as costs money.
+Because the extension depends on a native component, it must be installed by the user
+outside of the browser. In order to provide a useful installer
+that can automatically install the browser components as well (minimizing the
+difficulty in setting up the system for use), it is necessary to publish the extension
+on the Chrome Web Store, which we have not done because a small payment is required
+before authors may submit extensions to said Web Store (to discourage
+submission of malicious extensions).
 
 Currently our tool only supports Google Chrome (more generally, Chromium derivatives). There is no technical reason we can't support other browsers (Firefox, IE/Edge), but due to lack of time we chose to focus effort on only one implementation.
 
 In addition, we heavily rely on user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that would not work as good as we would like (as the database would be mostly biased). We also assume honest reports, as noted in the discussion.
 
-Another future direction for this work is to support public-key verification (PGP), which gives stronger guarantees than simply checking hashes.
+To provide stronger guarantees regarding file authenticity, we could add support for
+public-key verification, notably via PGP. Fewer hosts even distribute PGP signatures with
+their files than publish hashes and the directory server is not useful in such a case,
+but successful verification of a PGP signature provides
+very strong guarantees regarding the authenticity of a file.
 
-Currently, our tool does not read the page where the download is being offered and does not try to locate and parse the signature. The directory server is our attempt to address this limitation. However, there are common patters that satisfactorily identify and parses signatures (or links offering the signature file) that could be added to the system to increase reliability. We believe the only way to be 100\% secure about the file signature is to get it from the software developer. Unfortunately, the majority of pages do not publish the signature for their downloads.
-
-Finally, there are many machine-learning techniques that would allow us to greatly increase the credibility and reliability of our directory server. As an example, we see the possibility of detecting and identify attempts of poisoning the directory by submitting false signatures.
+Currently, our tool does not read the page where the download is being offered and does not try to locate and parse the signature. The directory server is our attempt to address this limitation. However, there are common patterns that satisfactorily identify and parses signatures (or links offering the signature file) that could be added to the system to increase reliability. We believe the only way to be 100\% secure about the file signature is to get it from the software developer. Unfortunately, the majority of pages do not publish the signature for their downloads.
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{bibliography}}
