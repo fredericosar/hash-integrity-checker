@@ -184,7 +184,7 @@ contents of the referring page.
 
 For example, some file hosts publish checksums directly on the download pages. The
 extension could match the referring URL against those matching a known host, then
-scrape the referring page to retrieve the checksum's value. In cases where no host-specific
+scrape the referring page to retrieve the checksums value. In cases where no host-specific
 rules match, the extension may attempt to retrieve the directory containing the
 downloaded file and search for files with names commonly used for checksums. For
 example, a download of \texttt{https://example.com/linux/linux.iso} might prompt the
@@ -318,7 +318,7 @@ to publishers regarding which potential targets are more worth spending effort
 to support verification. The possibilities for mining of the directory are many, but
 may be limited by the choice to make submission to the directory opt-in.
 
-Link to our source code on github?
+Our Google Chrome extension along with the Google Chrome application and directory server is publicly available at GitHub~\cite{hic}.
 
 \section{Evaluation}
 Admittedly the final result of our tool is not exactly what we had originally set out to accomplish. We had wanted to create a standalone Google Chrome extension that would allow the user to download a file, compute the hash, and give feedback about the authenticity of the file to the user. As we have discussed before, the feasibility of being able to accomplish all of this within a Chrome extension alone does not appear to be possible by design of the Chrome sandboxed architecture. Through additional research into Chrome extension implementation we created a Chrome extension that uses native messaging between our extension and a native application to achieve all of our design goals. Coincidentally, after further inspection of McAfee SiteAdvisor's ability to automatically run a virus scan on user downloaded files from a Google Chrome extension, we discovered that McAfee also utilizes native messaging with a native application to access the local file system. This validates that our method of overcoming the limitations of the Chrome extension sandbox is used in practice by commercial software developers as well.
@@ -329,17 +329,21 @@ For three weeks we were able to test our extension in a live environment. The ex
 
 \section{Future Work}
 
-This section needs revision.
+We have presented our solution to protect against attacks that compromise integrity of a downloaded file. The solution is built using multiple components that work as standalone software but work together as they are connected directly.
 
-Hashing performance may be poor due to choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized).
+Much work remains. It is noticeable that our hashing performance may be poor due the choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized). We also hope to decrease complexity by simplifying the installation of the tool. 
 
-Setup is not as trivial as we would have liked. Requires installation of a native component, and actually providing a useful installer requires publishing the extension on the Chrome Web Store, which we have not done because it costs money.
+Unfortunately, setup is not as trivial as we would have liked. It requires installation of a native component and, to provide a useful installer it would be necessary to publish the extension on the Chrome Web Store, which we have not done because it as costs money.
 
-Currently only supports Google Chrome (more generally, Chromium derivatives). There is no technical reason we can't support other browsers (Firefox, IE/Edge), but we chose to focus effort on only one implementation.
+Currently our tool only supports Google Chrome (more generally, Chromium derivatives). There is no technical reason we can't support other browsers (Firefox, IE/Edge), but due to lack of time we chose to focus effort on only one implementation.
 
-Currently depends on  user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that’s not great. We also assume honest reports, as noted in the discussion.
+In addition, we heavily rely on user-submitted files for the most part. We could seed the database somehow (like scraping lots of the web for files and hashing them, assuming our seeding process is not tampered with), but that would not work as good as we would like (as the database would be mostly biased). We also assume honest reports, as noted in the discussion.
 
-Support public-key verification (PGP) in the future, which gives stronger guarantees than simply checking hashes.
+Another future direction for this work is to support public-key verification (PGP), which gives stronger guarantees than simply checking hashes.
+
+Currently, our tool does not read the page where the download is being offered and does not try to locate and parse the signature. The directory server is our attempt to address this limitation. However, there are common patters that satisfactorily identify and parses signatures (or links offering the signature file) that could be added to the system to increase reliability. We believe the only way to be 100\% secure about the file signature is to get it from the software developer. Unfortunately, the majority of pages do not publish the signature for their downloads.
+
+Finally, there are many machine-learning techniques that would allow us to greatly increase the credibility and reliability of our directory server. As an example, we see the possibility of detecting and identify attempts of poisoning the directory by submitting false signatures.
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{bibliography}}
