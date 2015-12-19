@@ -25,7 +25,7 @@
 
 \subsection*{Abstract}
 
-Cryptographic hash functions are often used to verify the integrity of files downloaded from the internet, but are rarely published by distributors and rarely checked by users even when available. We present a browser extension and associated infrastructure for automating hash checking of all downloaded files, suitable for use no matter the availability of an official hash for verification and providing a dataset useful for following files over time on the greater Internet.
+Cryptographic hash functions are often used to verify the integrity of files downloaded from the Internet, but are rarely published by distributors and rarely checked by users even when available. We present a browser extension and associated infrastructure for automating hash checking of all downloaded files, suitable for use no matter the availability of an official hash for verification and providing a dataset useful for following files over time on the greater Internet.
 
 \section{Introduction}
 
@@ -48,9 +48,9 @@ submit observed SSL certificates to the Observatory. The SSL Observatory is avai
 researchers to mine, of particular interest for investigating the reality of certificate authorities
 on the web.
 
-In``Automating phishing website identification through deep MD5 matching"~\cite{Wardman}, the authors described how it is possible by automated tools to generate hash signatures of entire web-pages and compare them with previous calculated and stored signatures in the attempt of avoid phishing. This work is relevant for our work as it provide the idea of looking at deltas on different version of hashes. This deltas can help the system to identify if the software has an updated version or if it was tampered by a possible attacker.
+In ``Automating phishing website identification through deep MD5 matching"~\cite{Wardman}, the authors described how it is possible by automated tools to generate hash signatures of entire web-pages and compare them with previous calculated and stored signatures in an attempt to avoid phishing. This work  provides the idea of looking at deltas on different version of hashes which is relevant to our project. This delta can help the system to identify if the software has an updated version or if it was tampered by a possible attacker.
 
-The browser plugins provided by VirusTotal~\cite{vtzilla,vtchromizer,vtexplorer} provide
+The browser plugins provided by VirusTotal~\cite{vtchromizer,vtexplorer,vtzilla} provide
 methods for users to scan both web pages and files for malware. In all cases, however, the
 user must specifically command the plugin to perform a scan so it is only useful if the user
 is already cognizant of a malware threat. Our system works without any intervention
@@ -126,11 +126,11 @@ in the documentation for the API generally relates to an open file dialog that a
 a file. This action of physically selecting a file demonstrates that the user is giving permission to the
 application to access the local filesystem. By requiring the user to open the file they just downloaded,
 this iteration of our design is comparable to other hashing applications available in the Chrome
-Web Store which require user intervention. 
+Web Store which require user interaction. 
 
 Our app could be used in a standalone fashion if
 the user chooses not to install the extension, but this design does not satisfy the design goal
-that files should be hashed automatically on download completion without user intervention.
+that files should be hashed automatically on download completion without user interaction.
 Originally we had desired to incorporate the entire tool as an extension; however, we learned
 over time that it was going to require native messaging with a native application to achieve all
 of our design goals.
@@ -167,7 +167,7 @@ This process has not been implemented fully because automating installation of c
 in the browser requires that they be published on the Chrome Web Store (for security reasons),
 which we have not done.
 
-\subsection{Validity heuristics}
+\subsection{Validity Heuristics}
 
 The ability to compute hashes of downloaded files automatically is often of limited utility,
 because users lack the information to make a decision regarding the validity of the
@@ -178,7 +178,7 @@ In some cases, digests are available from the publisher; sometimes directly on t
 which triggered the download, or other times in files next to the downloaded file on the
 originating server. The information regarding these sources is available to the extension
 code, so digests in these locations can be discovered through probing. Though we have not
-implemented this function, a functioning design might specify a series of rules to identify
+implemented this feature, a functioning design might specify a series of rules to identify
 published digests, each of which matches certain properties of the source URL and
 contents of the referring page.
 
@@ -219,7 +219,7 @@ The first directory server we linked to was the VirusTotal public API. VirusTota
 
 One of the methods for looking up a file using the VirusTotal public API is by sending VirusTotal the SHA-256 hash of the file. This method is used in our application to verify if the user's downloaded file is contained in the VirusTotal database. We chose this method since our native application has already calculated the hash of the file before connecting to a directory server. If the file is in the database we return the file name and detection results from VirusTotal back to the extension. The extension then creates a Chrome notification box that displays the results to the user. If the user clicks on the Chrome notification box the VirusTotal web page associated with the hash of their downloaded file is automatically opened so the user can see the full VirusTotal results. If the file hash is not in the VirusTotal database the Chrome notification displays the SHA-256 hash along with a message notifying the user that the file hash is not in the database. Whether the file hash is contained in the database or not it is left up to the user to decide if they trust the integrity of the file. The hash is displayed if the user wants to seek a different opinion from an alternate file hashing service or if they are able to make a comparison with a hash provided by another source; for example, a hash provided directly by the serving web page for the file.
 
-One of the drawbacks to using the VirusTotal directory server is that you have to have trust in VirusTotal to trust the results. Also since VirusTotal is mainly a malware checker, and not primarily focused on file integrity, it is still susceptible to a poisoning attack. If an attacker uploads their own malicious file to the VirusTotal server, that is not currently detectable by the commercial malware scanner VirusTotal uses, VirusTotal will just add that file information into their database. Then if a user downloads the file from a malicious hosting website using our extension they may get a false sense of security because the file was found in the VirusTotal database. VirusTotal tries to counter this attack by having a community voting option. For any VirusTotal results web page there is an option for any user to vote if the file is suspected to be malicious or not. The voting system is supposed to reassure the user and assist in making a decision about the file and move trust away from VirusTotal and more towards trust in the group consensus ~\cite{GroupPolarization}. This is also easily attacked because anonymous votes are allowed by the voting system; therefore, a diligent attacker would ensure there is numerous thumbs up votes for their malicious file.
+One of the drawbacks to using the VirusTotal directory server is that you have to trust VirusTotal to trust the results. Also since VirusTotal is mainly a malware checker, and not primarily focused on file integrity, it is still susceptible to a poisoning attack. If an attacker uploads their own malicious file to the VirusTotal server, that is not currently detectable by the commercial malware scanner VirusTotal uses, VirusTotal will just add that file information into their database. Then if a user downloads the file from a malicious hosting website using our extension they may get a false sense of security because the file was found in the VirusTotal database. VirusTotal tries to counter this attack by having a community voting option. For any VirusTotal results web page there is an option for any user to vote if the file is suspected to be malicious or not. The voting system is supposed to reassure the user and assist in making a decision about the file and move trust away from VirusTotal and more towards trust in the group consensus ~\cite{GroupPolarization}. This is also easily attacked because anonymous votes are allowed by the voting system; therefore, a diligent attacker would ensure there is numerous thumbs up votes for their malicious file.
 
 This complication of determining whether a file is malicious or not is one of the reasons Hash Integrity Checker focuses only on providing feedback about the file integrity. In the case above about downloading a malicious file from a malicious web server, Hash Integrity Checker should only confirm that the file is indeed the file you intended to download. It is still left up to the user to use other tools, like a malware scanner, to determine if the file is malicious.
 
@@ -302,7 +302,7 @@ Code signing systems can provide stronger protections against tampering in-trans
 such as Authenticode~\cite{Authenticode} on Windows and Gatekeeper
 ~\cite{Gatekeeper} on OS X, both of which provide strong cryptographic
 guarantees regarding the authenticity of application packages. Both of these
-systems are limited, however, in that they require the user put trust in a third party
+systems are limited, however, in that they require the user to trust a third party
 (a certificate authority or Apple, respectively) that malicious parties cannot resign
 modified applications after tampering with them.
 
@@ -332,7 +332,8 @@ For three weeks we were able to test our extension in a live environment. The ex
 
 We have presented our solution to protect against attacks that compromise integrity of a downloaded file. The solution is built using multiple components that work as standalone software but work together as they are connected directly.
 
-Much work remains. It is noticeable that our hashing performance may be poor due the choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized). We also hope to decrease complexity by simplifying the installation of the tool. 
+Much work remains. It is noticeable that our hashing performance may be poor due the choice of native hash implementations (from mbedTLS, which is easily portable but not particularly optimized). We also hope to decrease complexity by simplifying the installation of the tool.
+
 Because the extension depends on a native component, it must be installed by the user
 outside of the browser. In order to provide a useful installer
 that can automatically install the browser components as well (minimizing the
