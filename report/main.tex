@@ -39,8 +39,6 @@ Our extension, Hash Integrity Checker, is different from previous extensions in 
 
 \section{Related Work}
 
-TODO Also, we have as related work ``Automating phishing website identification through deep MD5 matching"~\cite{Wardman}.
-
 One of the challenges of creating a Google Chrome extension is navigating the Google Chrome extension security architecture. For the extension, we want to make sure we are requesting the correct permissions to achieve our design goals while ensuring that we are not using unnecessary permissions or requesting more access than is necessary for a permission. For example, when using the \texttt{chrome.fileSystem} API, and associated requested permission, is read access sufficient or does the application need write access as well? Previous researchers have detailed the security vulnerability involving the over-provisioning of permissions~\cite{180206}. For our extension we want to follow the guidelines set forth in their research to ensure we reduce the attack surface of our extension.
 
 The Electronic Frontier Foundation's SSL Observatory~\cite{ssl-observatory} plays a role
@@ -49,6 +47,8 @@ extension (HTTPS Everywhere~\cite{https-everywhere}) may opt to have the browser
 submit observed SSL certificates to the Observatory. The SSL Observatory is available for
 researchers to mine, of particular interest for investigating the reality of certificate authorities
 on the web.
+
+In``Automating phishing website identification through deep MD5 matching"~\cite{Wardman}, the authors described how it is possible by automated tools to generate hash signatures of entire web-pages and compare them with previous calculated and stored signatures in the attempt of avoid phishing. This work is relevant for our work as it provide the idea of looking at deltas on different version of hashes. This deltas can help the system to identify if the software has an updated version or if it was tampered by a possible attacker.
 
 The browser plugins provided by VirusTotal~\cite{vtzilla,vtchromizer,vtexplorer} provide
 methods for users to scan both web pages and files for malware. In all cases, however, the
